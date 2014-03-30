@@ -63,7 +63,7 @@ class CtlBR:
         self._state = ~self.read(0) & 0xff
 
     def send_state(self):
-        self.write(0, ~self._state | 0x03 & 0xff)
+        self.write(0, ~self._state & 0xfc)
 
     def get_br_leak(self):
         return bool(self._state & (1 << 0))
@@ -133,21 +133,31 @@ ctl = CtlBR()
 alarm = ownet.Sensor('/alarm')
 alarm.useCache(False)
 
+ctl.set_rr_fan(True)
+ctl.set_rr_fan_forced(True)
+ctl.send_state()
+
 while 1:
     if 'Ctl_BR' in alarm.entries():
         ctl.refresh_state()
         print '--- {0:08b} ---'.format(ctl._latch)
         print '--- {0:08b} ---'.format(ctl._state)
-        print 'BR Leak:  ', ctl.get_br_leak()
-        print 'RR Leak:  ', ctl.get_rr_leak()
-        print 'BR Light: ', ctl.get_br_light()
+        print 'BR Leak: ', ctl.get_br_leak()
+        print 'RR Leak: ', ctl.get_rr_leak()
+        print 'BR Light:', ctl.get_br_light(),
         if ctl.get_br_light_forced():
-            print '  (forced)'
-        print 'RR Light: ', ctl.get_rr_light()
+            print '(forced)'
+        else:
+            print
+        print 'RR Light:', ctl.get_rr_light(),
         if ctl.get_rr_light_forced():
-            print '  (forced)'
-        print 'RR Fan:   ', ctl.get_rr_fan()
+            print '(forced)'
+        else:
+            print
+        print 'RR Fan:  ', ctl.get_rr_fan(),
         if ctl.get_rr_fan_forced():
-            print '  (forced)'
+            print '(forced)'
+        else:
+            print
 
 ownet.finish()
