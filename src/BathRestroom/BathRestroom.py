@@ -5,9 +5,11 @@ import ownet
 from time import sleep
 
 class CtlBR:
+
     _sensor = None
     _state = None
     _latch = None
+
     def __init__(self):
         self._sensor = ownet.Sensor('/Ctl_BR')
         self._sensor.useCache(False)
@@ -127,11 +129,6 @@ class CtlBR:
 ownet.init('server:4304')
 
 ctl = CtlBR()
-#ctl.set_rr_fan_forced(False)
-#ctl.set_rr_fan(False)
-#ctl.send_state()
-
-#ctl.refresh_state()
 
 alarm = ownet.Sensor('/alarm')
 alarm.useCache(False)
@@ -152,8 +149,5 @@ while 1:
         print 'RR Fan:   ', ctl.get_rr_fan()
         if ctl.get_rr_fan_forced():
             print '  (forced)'
-
-ctl = None
-alarm = None
 
 ownet.finish()
