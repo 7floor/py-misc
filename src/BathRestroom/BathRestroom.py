@@ -2,6 +2,7 @@
 
 import sys
 import ownet
+import time
 from time import sleep
 
 class CtlBR:
@@ -9,6 +10,7 @@ class CtlBR:
     _sensor = None
     _state = None
     _latch = None
+    _strb = 0
 
     def __init__(self):
         self._sensor = ownet.Sensor('/Ctl_BR')
@@ -16,45 +18,57 @@ class CtlBR:
         self._sensor.out_of_testmode = 1
         self._sensor.por = 0
         self._sensor.set_alarm = "133333333"
-        self._relax()
+        self._strb = self._sensor.strobe
         self.refresh_state()
+        self.relax()
 
     def __del__(self):
         self._sensor = None
 
-    def _relax(self):
+    def relax(self):
         """
         relaxes outputs so that can be read freely later
         to be called after any write
         """
-        self._sensor.strobe = 0
-        self._sensor.PIO_BYTE = 0
+        if self._sensor.PIO_BYTE != 0:
+            if self._strb == 1:
+                self._strb = 0
+                self._sensor.strobe = 0
+                print 'strobe 0'
+            self._sensor.PIO_BYTE = 0
+            print 'relaxed'
 
     def _in(self):
+        self.relax()
         return self._sensor.sensed_BYTE
 
     def _out(self, data):
-        self._sensor.strobe = 1
+        if self._strb == 0:
+            self._strb = 1
+            self._sensor.strobe = 1
+            print 'strobe 1'
         self._sensor.PIO_BYTE = ~data & 0xff
 
     def _set_address(self, address):
         a = (address << 2) | 0x03
         self._out(a)
 
+    def knock(self, times):
+        d = self._in()
+        for i in range(times):
+            self._out(d)
+
     def write(self, address, data):
         if address != 0:
             self._set_address(address)
         self._out(data)
-        self._relax()
 
     def read(self, address):
         if address != 0:
             self._set_address(address)
-            self._relax()
         d = self._in()
         if address != 0:
             self._out(d)
-            self._relax()
         return d
 
     def refresh_state(self):
@@ -133,9 +147,17 @@ ctl = CtlBR()
 alarm = ownet.Sensor('/alarm')
 alarm.useCache(False)
 
-ctl.set_rr_fan(True)
-ctl.set_rr_fan_forced(True)
+ctl.set_br_light_forced(False)
+ctl.set_rr_light_forced(False)
+ctl.set_rr_fan_forced(False)
+#ctl.set_rr_fan_forced(True)
+#ctl.set_rr_fan(True)
+t1 = time.time()
+ctl.knock(3)
 ctl.send_state()
+ctl.relax()
+t2 = time.time()
+print 'Seconds elapsed: ', t2 - t1
 
 while 1:
     if 'Ctl_BR' in alarm.entries():
