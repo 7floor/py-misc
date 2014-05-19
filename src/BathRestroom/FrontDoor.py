@@ -15,7 +15,7 @@ while 1:
         s = snew
 
         localtime = time.localtime()
-        timeString  = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
+        timeString = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
 
         wassup = ''
 
