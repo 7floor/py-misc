@@ -11,14 +11,16 @@ class CtlBR:
     _state = None
     _latch = None
     _strb = 0
+    _byte = 0
 
     def __init__(self):
         self._sensor = ownet.Sensor('/Ctl_BR')
-        self._sensor.useCache(False)
+        self._sensor.useCache(True)
         self._sensor.out_of_testmode = 1
         self._sensor.por = 0
         self._sensor.set_alarm = "133333333"
         self._strb = self._sensor.strobe
+        self._byte = self._sensor.PIO_BYTE
         self.refresh_state()
         self.relax()
 
@@ -30,11 +32,14 @@ class CtlBR:
         relaxes outputs so that can be read freely later
         to be called after any write
         """
-        if self._sensor.PIO_BYTE != 0:
+        if self._byte != 0:
+        #if self._sensor.PIO_BYTE != 0:
             if self._strb == 1:
+            #if self._sensor.strobe == 1:
                 self._strb = 0
                 self._sensor.strobe = 0
                 print 'strobe 0'
+            self._byte = 0
             self._sensor.PIO_BYTE = 0
             print 'relaxed'
 
@@ -44,10 +49,13 @@ class CtlBR:
 
     def _out(self, data):
         if self._strb == 0:
+        #if self._sensor.strobe == 0:
             self._strb = 1
             self._sensor.strobe = 1
             print 'strobe 1'
-        self._sensor.PIO_BYTE = ~data & 0xff
+        self._byte = ~data & 0xff
+        self._sensor.PIO_BYTE = self._byte
+        #self._sensor.PIO_BYTE = ~data & 0xff
 
     def _set_address(self, address):
         a = (address << 2) | 0x03
@@ -158,6 +166,14 @@ ctl.send_state()
 ctl.relax()
 t2 = time.time()
 print 'Seconds elapsed: ', t2 - t1
+
+
+#t1 = time.time()
+#for i in range(50):
+#    a = ctl._sensor.PIO_BYTE
+#    a = ctl._sensor.sensed_BYTE
+#t2 = time.time()
+#print 'Seconds elapsed: ', t2 - t1
 
 while 1:
     if 'Ctl_BR' in alarm.entries():
