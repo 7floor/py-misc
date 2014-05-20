@@ -29,7 +29,7 @@ sensor = ownet.Sensor('/Ctl_FrontDoor')
 #    for i in range(0, 6):
 #        sensor.PIO_BYTE = (1 << i)
 
-s = 0
+s = sensor.sensed_BYTE
 while 1:
     snew = sensor.sensed_BYTE
     if snew != s:
