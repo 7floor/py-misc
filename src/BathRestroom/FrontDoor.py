@@ -4,6 +4,7 @@ __author__ = 'Dmitry'
 
 import ownet
 import time
+import sys
 
 ownet.init('server:4304')
 sensor = ownet.Sensor('/Ctl_FrontDoor')
@@ -64,5 +65,6 @@ while 1:
                 wassup += 'pressed'
 
         print timeString, wassup
+        sys.stdout.flush()
 
 ownet.finish()
