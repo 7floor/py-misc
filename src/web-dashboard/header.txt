@@ -1,0 +1,25 @@
+3g
+Origin=http://7floor.now.im:8086
+User-Agent=Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 920) like Gecko
+*Connection=Keep-Alive
++Via=1.1 London
+Upgrade=Websocket
+Dnt=1
+Host=7floor.now.im:8086
+Cache-Control=no-cache
+Sec-Websocket-Version=13
+Sec-Websocket-Key=T0bjZljxBoAoc30Qlp+S+A==
++X-Forwarded-For=37.17.114.41
+bad websocket request, aborting
+
+wifi
+Origin=http://7floor.now.im:8086
+User-Agent=Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 920) like Gecko
+Connection=Upgrade
+Upgrade=Websocket
+Dnt=1
+Host=7floor.now.im
+Cache-Control=no-cache
+Sec-Websocket-Version=13
+Sec-Websocket-Key=5oEOWf7foPBQ9Zn5R+hEXQ==
+connected, clients: 1

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>Home Dashboard</title>
 
     <!-- Bootstrap -->
@@ -18,6 +18,9 @@
     <![endif]-->
  <script type="text/javascript">
     var ws = new WebSocket("ws://" + location.host + "/ws");
+    //ws.onopen = function() {
+    //    ws.send("hello");
+    //};
     ws.onmessage = function (evt) {
 	var msg = JSON.parse(evt.data);
 	var elem = document.getElementById(msg.key);

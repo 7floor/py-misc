@@ -1,9 +1,10 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
+import os
+import sys
 import time
 import paho.mqtt.client as mqtt
-
-pattern = [0b10000001, 0b00000010, 0b10000100, 0b00001000, 0b10010000, 0b00100000]
 
 
 class FdGuard():
@@ -25,7 +26,7 @@ class FdGuard():
     def _sleep(self, sec):
         t = time.time()
         while time.time() - t < sec:
-            self._mqttc.loop(0)
+            self._mqttc.loop(0.1)
 
     def _locked(self):
         return self._upper or self._lower
@@ -35,7 +36,6 @@ class FdGuard():
         self._mqttc.loop(0)
 
     def run(self):
-        global pattern
         while True:
             print "locked"
             self._set_alarm(False)
@@ -57,6 +57,9 @@ class FdGuard():
             while not self._locked():
                 self._sleep(0.1)
 
+
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+print 'Started'
 
 fdg = FdGuard()
 fdg.run()

@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 from coos import *
 import time
 import pyownet.protocol as onewire
@@ -35,5 +37,8 @@ sched.new(temperatures(ow, {
     'Temp_Kids': 'Детская',
     'Temp_Closet': 'Кладовая',
 }))
+
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+print 'Started'
 
 sched.mainloop()

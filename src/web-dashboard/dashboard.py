@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import paho.mqtt.client as mqtt
 from bottle import *
 from json import dumps
@@ -79,8 +81,14 @@ def index():
 @app.route('/ws')
 def handle_websocket():
     global sockets
+
+    print "Request to websocket, showing HTTP header:"
+    for key in request.headers:
+        print "  {0}={1}".format(key, request.headers[key])
+
     ws = request.environ.get('wsgi.websocket')
     if not ws:
+        print 'bad websocket request, aborting'
         abort(400, 'Expected WebSocket request.')
     sockets.add(ws)
     print 'connected, clients:', len(sockets)
@@ -89,6 +97,9 @@ def handle_websocket():
     while ws in sockets:
         gevent.sleep(1)
 
+
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+print 'Started'
 
 gevent.spawn(mqtt_worker)
 server = WSGIServer(("0.0.0.0", 8080), app, handler_class = WebSocketHandler)
