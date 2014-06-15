@@ -94,6 +94,8 @@ def handle_websocket():
     print 'connected, clients:', len(sockets)
     for topic in data:
         send_to_socket(ws, topic, data[topic])
+    for socket in set(sockets):  # make copy here because sockets set can be modified by removing failed sockets
+        send_to_socket(socket, 'dashboard-status', str(len(sockets)) + ' client(s)')
     while ws in sockets:
         gevent.sleep(1)
 
