@@ -43,19 +43,28 @@ def transform_payload(topic, payload):
     return payload
 
 
+def update_clients_count():
+    send_to_all('dashboard-status', str(len(sockets)) + ' client(s)')
+
+
+def send_to_all(key, value):
+    for socket in set(sockets):  # make copy here because sockets set can be modified by removing failed sockets
+        send_to_socket(socket, key, value)
+
+
 def send_to_socket(socket, key, value):
     try:
         socket.send(dumps({'key': key, 'value': value}, ensure_ascii=False, encoding='utf8'))
     except WebSocketError:
         sockets.remove(socket)
         print 'disconnected, clients:', len(sockets)
+        update_clients_count()
 
 
 def mqtt_on_message(mqttc, obj, msg):
     key, value = msg.topic, transform_payload(msg.topic, msg.payload)
     data[key] = value
-    for socket in set(sockets):  # make copy here because sockets set can be modified by removing failed sockets
-        send_to_socket(socket, key, value)
+    send_to_all(key, value)
 
 
 def mqtt_worker():
@@ -94,8 +103,7 @@ def handle_websocket():
     print 'connected, clients:', len(sockets)
     for topic in data:
         send_to_socket(ws, topic, data[topic])
-    for socket in set(sockets):  # make copy here because sockets set can be modified by removing failed sockets
-        send_to_socket(socket, 'dashboard-status', str(len(sockets)) + ' client(s)')
+    update_clients_count()
     while ws in sockets:
         gevent.sleep(1)
 
