@@ -5,8 +5,8 @@ from time import time, sleep
 timeout = 60
 
 
-@subscribe('home/front door/#')
-def on_door_changed(message):
+@subscribe('home/front door/lock/#')
+def on_lock_changed(message):
     global upper, lower, locked
     if 'upper' in message.topic:
         upper = False if message.payload == "0" else True
