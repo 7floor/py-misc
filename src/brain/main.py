@@ -52,7 +52,7 @@ def initialize():
     mqtt_client = mqtt.Client("brain")
     plugin.publish = publish_impl
 
-    import logging
+    import logging, logging.handlers
     root = logging.getLogger()
     root.setLevel(logging.NOTSET)
 
@@ -62,7 +62,7 @@ def initialize():
     out_handler.setFormatter(formatter)
     root.addHandler(out_handler)
 
-    file_handler = logging.FileHandler('brain.log')
+    file_handler = logging.handlers.TimedRotatingFileHandler('brain.log', when='midnight', backupCount=5)
     file_handler.setFormatter(formatter)
     root.addHandler(file_handler)
 
