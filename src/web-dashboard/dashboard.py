@@ -64,7 +64,7 @@ def send_to_socket(socket, key, value):
 def mqtt_on_message(mqttc, obj, msg):
     key, value = msg.topic, transform_payload(msg.topic, msg.payload)
     data[key] = value
-    send_to_all(key, value)
+    gevent.spawn(send_to_all, key, value)
 
 
 def mqtt_worker():
@@ -72,8 +72,13 @@ def mqtt_worker():
     mqttc.on_message = mqtt_on_message
     mqttc.connect("server", 1883, 60)
     mqttc.subscribe("home/#", 2)
-    while True:
-        mqttc.loop()  # requires gevent monkey patch
+    try:
+        while True:
+            mqttc.loop()  # requires gevent monkey patch
+    except:
+        print 'exiting from mqtt_worker due to exception'
+        mqttc.disconnect()
+        raise
 
 
 @app.route('/<folder:re:(js)|(fonts)|(css)>/<filename:path>')
