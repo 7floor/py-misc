@@ -8,11 +8,14 @@ import sys, os, inspect, glob
 
 
 def mqtt_worker():
-    mqtt_client.connect("server", 1883, 60)
-    mqtt_client.subscribe("home/#", 2)
-    while True:
-        mqtt_client.loop()  # requires gevent monkey patch
-    mqtt_client.disconnect()
+    c = dict(config.items('MQTT'))
+    mqtt_client.connect(host=c['host'], port=int(c['port']), keepalive=int(c['keepalive']))
+    mqtt_client.subscribe(c['root'] + "#", 2)
+    try:
+        while True:
+            mqtt_client.loop()  # requires gevent monkey patch
+    finally:
+        mqtt_client.disconnect()
 
 
 def run_async(f):
@@ -45,6 +48,11 @@ def publish_impl(topic, payload, qos=0, retain=False):
 def initialize():
     import plugin
 
+    import ConfigParser
+    cfg = ConfigParser.ConfigParser()
+    cfg.read('brain.cfg')
+    plugin.config = cfg
+
     import paho.mqtt.client as mqtt
     #monkey patch mqtt to allow multiple callbacks per filter pattern
     mqtt.Client.message_callback_add = message_callback_add_patched
@@ -58,11 +66,15 @@ def initialize():
 
     formatter = logging.Formatter('%(asctime)s %(name)s.%(module)s %(levelname)s: %(message)s')
 
-    out_handler = logging.StreamHandler(sys.stdout)
-    out_handler.setFormatter(formatter)
-    root.addHandler(out_handler)
+    s, o = 'logging', 'console'
+    if cfg.has_option(s, o) and cfg.getboolean(s, o):
+        out_handler = logging.StreamHandler(sys.stdout)
+        out_handler.setFormatter(formatter)
+        root.addHandler(out_handler)
 
-    file_handler = logging.handlers.TimedRotatingFileHandler('brain.log', when='midnight', backupCount=5)
+    fn = cfg.get(s, 'file')
+    bk = cfg.getint(s, 'backups')
+    file_handler = logging.handlers.TimedRotatingFileHandler(filename=fn, when='midnight', backupCount=bk)
     file_handler.setFormatter(formatter)
     root.addHandler(file_handler)
 

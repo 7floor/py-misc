@@ -30,4 +30,8 @@ def publish(topic, payload, qos=0, retain=False):
     pass
 
 
-logger = None
+import ConfigParser
+config = ConfigParser.ConfigParser()
+
+import logging
+logger = logging.getLogger()
