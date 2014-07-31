@@ -11,8 +11,8 @@ import gevent
 from gevent.pywsgi import WSGIServer
 from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
-from gevent.monkey import patch_all; patch_all()  # this also patches the mqtt!!
-
+from gevent.monkey import patch_all
+patch_all()  # this also patches the mqtt!!
 
 app = Bottle()
 sockets = set()
@@ -29,8 +29,10 @@ def transform_payload(topic, payload):
         if payload == 'open': return 'Открыта'
         if payload == 'closed': return 'Закрыта'
     if '/front door/lock' in topic:
-        if payload == '0': return 'Открыт'
-        else: return 'Закрыт на {0} об.'.format(payload)
+        if payload == '0':
+            return 'Открыт'
+        else:
+            return 'Закрыт на {0} об.'.format(payload)
     if '/front door/button' in topic:
         if payload == 'pressed': return 'Нажата'
         if payload == 'released': return 'Не нажата'
@@ -83,7 +85,7 @@ def mqtt_worker():
 
 @app.route('/<folder:re:(js)|(fonts)|(css)>/<filename:path>')
 def send_static(folder, filename):
-    return static_file(filename, root='./'+folder)
+    return static_file(filename, root='./' + folder)
 
 
 @app.get('/')
@@ -117,5 +119,7 @@ sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 print 'Started'
 
 gevent.spawn(mqtt_worker)
-server = WSGIServer(("0.0.0.0", 8080), app, handler_class = WebSocketHandler)
+# generate ssl certificates as follows:
+# openssl req -new -x509 -out wdb.crt -keyout wdb.key -days 365 -nodes
+server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler, certfile='wdb.crt', keyfile='wdb.key')
 server.serve_forever()

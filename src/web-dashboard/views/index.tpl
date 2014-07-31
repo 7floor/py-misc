@@ -17,7 +17,7 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
  <script type="text/javascript">
-    var ws = new WebSocket("ws://" + location.host + "/ws");
+    var ws = new WebSocket("wss://" + location.host + "/ws");
     //ws.onopen = function() {
     //    ws.send("hello");
     //};
