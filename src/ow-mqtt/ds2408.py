@@ -16,7 +16,10 @@ class Ds2408:
         self._sequential_alarms_count = 0
 
         self._reset()
-        self._old = self._read_sensed()
+        new = self._read_sensed()
+        old = new ^ 0xFF
+        self._process_data(old, new)
+        self._old = new
 
     def _reset(self):
         self._ow.write('/'+self._name+'/out_of_testmode', onewire.str2bytez("1"))
