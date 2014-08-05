@@ -2,8 +2,8 @@
 
 ### BEGIN INIT INFO
 # Provides:          sh-web-dashboard
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
+# Required-Start:    $remote_fs $syslog mosquitto
+# Required-Stop:     $remote_fs $syslog mosquitto
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Start sh-web-dashboard at boot time
