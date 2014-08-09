@@ -119,7 +119,6 @@ sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
 print 'Started'
 
 gevent.spawn(mqtt_worker)
-# generate ssl certificates as follows:
-# openssl req -new -x509 -out wdb.crt -keyout wdb.key -days 365 -nodes
-server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler, certfile='wdb.crt', keyfile='wdb.key')
+#server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler, certfile='server.crt', keyfile='server.key')
+server = WSGIServer(("0.0.0.0", 8080), app, handler_class=WebSocketHandler)
 server.serve_forever()

@@ -17,10 +17,7 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
  <script type="text/javascript">
-    var ws = new WebSocket("wss://" + location.host + "/ws");
-    //ws.onopen = function() {
-    //    ws.send("hello");
-    //};
+    var ws = new WebSocket(window.location.protocol.replace("http", "ws") + "//" + location.host + "/ws");
     ws.onmessage = function (evt) {
 	var msg = JSON.parse(evt.data);
 	var elem = document.getElementById(msg.key);
