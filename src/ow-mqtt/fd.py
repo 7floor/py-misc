@@ -20,11 +20,11 @@ class Fd(Ds2408):
         self._alarm = ""
 
     def mqtt_on_message(self, mqttc, obj, msg):
-        if msg.topic == "home/front door/alarm": # L - light, S - sound, LS - both
+        if msg.topic == "home/front door/alarm": # L - light, S - sound, LS - both, B - beep once
             self._alarm = msg.payload
 
     def _is_control(self):
-        return self._alarm in ["L", "S", "LS"]
+        return self._alarm in ["L", "S", "LS", "B"]
 
     def _on_control(self):
         while True:
@@ -34,6 +34,8 @@ class Fd(Ds2408):
                 pattern = [0b00000001, 0b00000010, 0b00000100, 0b00001000, 0b00010000, 0b00100000]
             elif self._alarm == "S":
                 pattern = [0b00000000, 0b10000000, 0b00000000, 0b00000000, 0b10000000, 0b00000000]
+            elif self._alarm == "B":
+                pattern = [0b10111111]
             else:
                 break
             for b in pattern:
@@ -46,6 +48,10 @@ class Fd(Ds2408):
                     self._old = new
                 if not self._is_control():
                     break
+            # Beep is one time
+            if self._alarm == "B":
+                self._alarm = ""
+                break
         self._flush_latch()
 
     def _process_data(self, old, new):
