@@ -83,7 +83,7 @@ def mqtt_worker():
         raise
 
 
-@app.route('/<folder:re:(js)|(fonts)|(css)>/<filename:path>')
+@app.route('/<folder:re:(js)|(fonts)|(css)|(img)>/<filename:path>')
 def send_static(folder, filename):
     return static_file(filename, root='./' + folder)
 

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>Home Dashboard</title>
 
+    <link href="img/favicon.ico" rel="icon" type="image/x-icon" />
+    
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/dashboard.css" rel="stylesheet">
